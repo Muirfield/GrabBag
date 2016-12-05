@@ -27,15 +27,27 @@ Basic Usage:
 * gmc - Switch to creative mode
 * gma - Switch to adventure mode
 * slay - kill a player
-* heal - Restore health to a player
+* heal - Restore health to a player *unable to test*
 * whois - Info about a player
 * showtimings - Display the info gathered through /timings
-* seearmor - show player's armor
+* seearmor - show player's armor *broken in 1.5*
 * seeinv - show player's inventory
+* clearinv - Clear player's inventory
 * get - obtain an item
 * shield [up|down] - Protect a player
 * servicemode [on|off] - enter maintenance mode
 * opms [msg] - send op only chat messages
+* entities - manage entities
+* mute/unmute [player] - mute players
+* freeze/thaw [player] - freeze players
+* after [secs] cmd - Schedule command
+* at [timespec] cmd - Schedule command
+* rpt [message] - report issues to ops
+* summon <player> [msg] - teleports <player> to you.
+* dismiss <player> [msg] - teleports <player> back to where they were
+  summoned.
+* pushtp <x y z|player|world> - save current location and teleport
+* poptp - goes back to saved location
 * !! - repeat command with changes
 
 Documentation
@@ -74,18 +86,64 @@ plugins.
   Show player's armor
 * *seeinv* *player*  
   Show player's inventory
+* *clearinv* *player*  
+  Clear player's inventory
 * *get* *item[:damage]* _[amount]_  
   Obtain an *item*.  When the item name contain spaces in the name,
   use `_` instead.
 * *shield* _[up|down]_  
   Show shield status.  Or raise/lower shields.
-* *servicemode* _[on|off]_  _[message]_
+* *servicemode* _[on|off]_  _[message]_  
   In servicemode, new connections are not allowed.  Existing users are
   OK.  Ops (gb.servicemode.allow) can always login.
-* *opms* text
+* *opms* text  
   Send a message that can only be seen by ops or by the console.  You
   should use the *ops* command to see if there are any server ops
   on-line.
+* *mute|unmute* _[player]_  
+  Stops players from chatting.  If no player specified it will show a
+  list of mutes.
+* *freeze|thaw* _[player]_  
+  Stops players from moving.  If no player specified it will show a
+  list of statues.
+* *at* *time* _[:]_ *command*  
+  Will schedule to run *command* at the given date/time.  This uses
+  php's [strtotime](http://php.net/manual/en/function.strtotime.php)
+  function so *times* must follow the format described in
+  [Date and Time Formats](http://php.net/manual/en/datetime.formats.php).
+* *after* *seconds* *command*  
+  Will schedule to run *command* after *seconds*.
+* *entities* _level_ _subcommand_  
+  By default it will show the current entities.  The following
+  sub-commands are available:
+  * *tiles*  
+    Show tile entities
+  * *info* _[e#|t#]_  
+    Show details about one or more entities or tiles.
+  * *rm* _[e#]_  
+    Removes one or more entities.
+  * *signN* _[t#]_ _message text_  
+    Changes the text line _N_ in the tile/sign identified by _t#_.
+* *rpt* _[text]_
+  Report issues to server ops.  Sub commands:
+  * read
+    Show messages
+  * clear _[m#|all]_
+    Clears messages
+* *summon* <player> [msg]  
+  teleports <player> to you.
+* *dismiss* <player> [msg]  
+  teleports <player> back to where they were summoned from.
+* *pushtp* <x y z|player|world>
+  save current location and teleport (if desired).
+* *poptp*
+  goes back to saved location.  Push and pop work in a stack.  Push
+  will save the current location on the top of the stack, while pop
+  will pop it from the top of the stack.
+
+Note that commands scheduled with `at` and `after` will only run as
+long as the server is running.  These scheduled commands will *not*
+survive server reloads or reboots.
 
 ### Command repeater
 
@@ -101,6 +159,10 @@ things:
 	!!2
 	!!3
   This will start showing the output of `/mw ls` and consecutive pages.
+* `!!` `/`  
+  if you forgot the `/` in front, this command will add it.  Example:
+	help
+	!!/
 * `!!` text  
   Will append `text` to the previous command.  For example:
 	/gamemode
@@ -119,21 +181,29 @@ things:
 Also this plugin supports the following modules:
 
 * adminjoin : Broadcast a message when an op joins.
+* servermotd : Display the server's motd when connecting.
 * spawnitems : Initialize a player inventory when they spawn.  
   It will place a configuratble list of inventory items.  Note that it
   only does it for users who start without any inventory.  As soon as
   they start owning stuff, spawnitems will stop working for them.
 * spawnarmor : Initialize a player armor when they spawn.  
+  *Broken in 1.5*
   I will configure a player's armor through a configurable list.  Note
   that it only does it for users without armor.
 * compasstp: When holding a compass tap the screen for 1 second, will
   teleport you in the direciton you are facing.
+* unbreakable : Unbreakable blocks.
 
 ### Configuration
 
 Configuration is through the `config.yml` file:
 
 	---
+	settings:
+	  hard-freeze: false
+	unbreakable:
+	  - 32
+	  - 45
 	spawn:
 	  armor:
 	    head: '-'
@@ -144,7 +214,16 @@ Configuration is through the `config.yml` file:
 	  - "272:0:1"
 	  - "17:0:16"
 	  - "364:0:5"
+
 	...
+
+Settings:
+
+* `hard-freeze` : if `true` no movement is allowed for frozen
+  players.  If `false`, moves are not allowed, but turning is allowed.
+
+The `unbreakable` section is for the `unbreakable` listener module.
+Lists block ids that can not be broken.
 
 The `spawn` section contains two lists:
 
@@ -156,6 +235,8 @@ The `spawn` section contains two lists:
 
 There is a `modules.yml` that by default activates all modules.  You
 can de-activate modules by commenting them out from `modules.yml`.
+This is done by inserting a `#` in front of the text.
+
 
 ### Permission Nodes:
 
@@ -171,6 +252,7 @@ can de-activate modules by commenting them out from `modules.yml`.
 * gb.cmd.whois.showip: Allow to view IP addresses
 * gb.cmd.seearmor: Show player's armor
 * gb.cmd.seeinv: Show player's inventory
+* gb.cmd.clearinv: Clear player's inventory
 * gb.cmd.get: get blocks.  A shortcut to give.
 * gb.spawnarmor.receive: allows player to receive armor when spawning
 * gb.spawnitems.receive: allows player to receive items when spawning
@@ -179,10 +261,39 @@ can de-activate modules by commenting them out from `modules.yml`.
 * gb.cmd.shield: Allow players to become invulnerable
 * gb.cmd.servicemode: Allow access to service mode command
 * gb.servicemode.allow: Allow login when in service mode.
+* gb.cmd.entities: Manage entities
+* gb.cmd.mute: mute/unmute
+* gb.cmd.freeze: freeze/thaw
+* gb.cmd.after: Access to command scheduler
+* gb.cmd.rpt: Report issues
+* gb.cmd.rpt.read: Read reported issues
+* gb.ubab.override: Can break blocks in the ubab list.
+* gb.cmd.summon: Access to summon/dismiss command
+* gb.cmd.pushpoptp: Access to push/pop teleport
 
 Changes
 -------
-
+* 1.4.1: maintenance
+  * Fixed a bug in showtimings.
+  * Fixed improper usage of the API in Removing Tile and Entities.
+  * Changed so unbreakable is off by default
+* 1.4.0
+  * new commands: clearinv, rpt
+  * new listeners: unbreakable
+  * players : shows game mode
+  * et signX : new subcommand
+  * summon/dismiss commands
+  * push/pop teleport commands
+* 1.3.0: More Commands
+  * Added !! / to repeater
+  * Added freeze and mute commands
+  * Added at and after commands
+  * Improved entities output
+  * Improved documentation
+* 1.2.0 : Additional functionality
+  * Entities command
+  * servermotd module
+  * Fixed one warning
 * 1.1.2 : Fixes
   * showtimings, added clear operation.
   * "/as": bug fixes
@@ -222,3 +333,23 @@ Copyright
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+* * *
+
+# REFACTOR
+
+* Main
+  * loader
+  * config
+  * state
+
+* Command
+  - common code
+    - paginate
+    - inGame
+    - access
+  <xxx>Cmd - modules.yml contains the cmd to class mapping
+  execute(Sender,$cmd,$args)
+
+* Manager - modules.yml contains the listener to class mapping
+  * <xxx>Mgr
