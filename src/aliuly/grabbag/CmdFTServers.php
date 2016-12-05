@@ -14,10 +14,11 @@ use pocketmine\command\Command;
 
 use pocketmine\utils\TextFormat;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\PermUtils;
-use aliuly\grabbag\common\MPMU;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\PermUtils;
+use aliuly\common\MPMU;
+use aliuly\common\FastTransfer;
 
 class CmdFtServers extends BasicCli implements CommandExecutor {
 
@@ -40,12 +41,12 @@ class CmdFtServers extends BasicCli implements CommandExecutor {
 			return false;
 		}
     if (!MPMU::inGame($sender)) return true;
-    $host = $dat["host"];
-		$port = $dat["port"];
-    if (MPMU::callPlugin($this->owner->getServer(),"FastTransfer","transferPlayer",[$sender,$host,$port]) === null) {
-      $this->getLogger()->error(TextFormat::RED.mc::_("FAST TRANSFER ERROR"));
-      return true;
-    }
+
+		$host = $this->owner->getModule("ServerList")->getServerAttr($id,"ft-host");
+		$port = $this->owner->getModule("ServerList")->getServerAttr($id,"port");
+
+		if (!FastTransfer::transferPlayer($sender,$host,$port))
+      $this->owner->getLogger()->error(TextFormat::RED.mc::_("FAST TRANSFER ERROR"));
     return true;
 	}
 

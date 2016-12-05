@@ -40,11 +40,11 @@ use pocketmine\plugin\PluginManager;
 use pocketmine\plugin\PluginDescription;
 use pocketmine\utils\Config;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\PermUtils;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\FileUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\PermUtils;
+use aliuly\common\MPMU;
+use aliuly\common\FileUtils;
 
 class CmdPluginMgr extends BasicCli implements CommandExecutor {
 	private function findPlugin($path) {
@@ -226,6 +226,7 @@ class CmdPluginMgr extends BasicCli implements CommandExecutor {
 		$lang = count($args) == 1 ? $args[0] : "messages";
 		$file = $this->getPluginFilePath($plugin)."/resources/messages/".$lang.".ini";
 		if (!file_exists($file)) {
+			echo "FILE=$file\n";//##DEBUG
 			$c->sendMessage(mc::_("Missing language file %1%", $lang));
 			return true;
 		}

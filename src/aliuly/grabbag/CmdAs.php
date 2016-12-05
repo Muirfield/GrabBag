@@ -8,10 +8,10 @@ use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 use pocketmine\Player;
 use pocketmine\event\player\PlayerChatEvent;
@@ -33,17 +33,14 @@ class CmdAs extends BasicCli implements CommandExecutor {
 			$sender->sendMessage(mc::_("Must specified a player and a command"));
 			return false;
 		}
-		$player = $this->owner->getServer()->getPlayer($n = array_shift($args));
-		if (!$player) {
-			$sender->sendMessage(mc::_("Player %1% not found",$n));
-			return true;
-		}
+		if (($player = MPMU::getPlayer($sender,$n = array_shift($args))) === null) return true;
+
 		if ($args[0] == 'chat' || $args[0] == 'say') {
 			array_shift($args);
 			$chat = implode(" ",$args);
 			$this->owner->getServer()->getPluginManager()->callEvent($ev = new PlayerChatEvent($player,$chat));
 			if (!$ev->isCancelled()) {
-				if (MPMU::apiVersion("1.12.0")) {
+				if (MPMU::apiVersion("1.12.0")||MPMU::apiVersion("2.0.0")) {
 					$s = $this->owner->getServer();
 					$s->broadcastMessage($s->getLanguage()->translateString(
 						$ev->getFormat(),

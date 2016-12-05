@@ -24,9 +24,9 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\PermUtils;
 
 class CmdSpectator extends BasicCli implements CommandExecutor,Listener {
 	protected $watchers;
@@ -46,6 +46,7 @@ class CmdSpectator extends BasicCli implements CommandExecutor,Listener {
 								"permission" => "gb.cmd.spectator"]);
 		$this->watchers = [];
 		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
+		$this->owner->getLogger(mc::_("%1% is deprecated!", "spectator"));
 	}
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
 		if (count($args) == 0) {

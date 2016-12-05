@@ -14,10 +14,11 @@ use pocketmine\command\Command;
 use pocketmine\utils\TextFormat;
 use pocketmine\item\Item;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\ItemName;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\ItemName;
+use aliuly\common\PermUtils;
+use aliuly\common\MPMU;
 
 class CmdShowInv extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
@@ -41,11 +42,7 @@ class CmdShowInv extends BasicCli implements CommandExecutor {
 			$sender->sendMessage(mc::_("You must specify a player's name"));
 			return false;
 		}
-		$target = $this->owner->getServer()->getPlayer($args[0]);
-		if($target == null) {
-			$sender->sendMessage(mc::_("%1% can not be found.",$args[0]));
-			return true;
-		}
+		if (($target = MPMU::getPlayer($sender,$args[0])) === null) return true;
 		if ($cmd->getName() == "seeinv") {
 			$tab= [[$args[0],mc::_("Count"),mc::_("Damage")]];
 			$max = $target->getInventory()->getSize();

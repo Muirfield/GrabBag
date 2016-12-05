@@ -34,10 +34,10 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Config;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdOpMsg extends BasicCli implements CommandExecutor,Listener {
 	protected $rpt;
@@ -154,6 +154,7 @@ class CmdOpMsg extends BasicCli implements CommandExecutor,Listener {
 	public function onPlayerJoin(PlayerJoinEvent $e) {
 		$pl = $e->getPlayer();
 		if ($pl == null) return;
+		//echo __METHOD__.",".__LINE__."\n";//##DEBUG
 		if (!$pl->hasPermission("gb.cmd.rpt.read")) return;
 		list($id,$rpt) = $this->rpt->getAll();
 		if (count($rpt)) $pl->sendMessage(

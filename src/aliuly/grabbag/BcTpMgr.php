@@ -11,14 +11,15 @@ namespace aliuly\grabbag;
 use pocketmine\plugin\PluginBase as Plugin;
 use pocketmine\event\Listener;
 use pocketmine\event\entity\EntityTeleportEvent;
+use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\Player;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\level\particle\DustParticle;
 use pocketmine\level\sound\FizzSound;
 
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
 
 class BcTpMgr implements Listener {
 	public $owner;
@@ -48,7 +49,25 @@ class BcTpMgr implements Listener {
 		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
 		$this->world = $cfg["world"];
 		$this->local = $cfg["local"];
+		//echo __METHOD__.",".__LINE__."\n"; //##DEBUG
 	}
+	private function addFx($xpos) {
+		if (!MPMU::apiVersion("1.12.0")&&!MPMU::apiVersion("2.0.0")) return;
+		foreach ($xpos as $pos) {
+			for ($i=0;$i<20;$i++) {
+				$pos->getLevel()->addParticle(new DustParticle(self::randVector($pos),(mt_rand()/mt_getrandmax())*2,255,255,255));
+			}
+			$pos->getLevel()->addSound(new FizzSound($pos));
+		}
+	}
+  /**
+	 * @priority MONITOR
+	 */
+  public function onRespawnEvent(PlayerRespawnEvent $ev) {
+		$pl = $ev->getPlayer();
+		$this->addFx([$pl]);
+	}
+
 	/**
 	 * @priority MONITOR
 	 */
@@ -61,17 +80,9 @@ class BcTpMgr implements Listener {
 		$to = $ev->getTo();
 		if (!$to->getLevel()) $to->setLevel($pl->getLevel());
 
-		if (MPMU::apiVersion("1.12.0")) {
-			foreach ([$to,$from] as $pos) {
-				for ($i=0;$i<20;$i++) {
-					$pos->getLevel()->addParticle(new DustParticle(self::randVector($pos),(mt_rand()/mt_getrandmax())*2,255,255,255));
-				}
-				$pos->getLevel()->addSound(new FizzSound($pos));
-			}
-		}
-
 		if ($from->getLevel()->getName() != $to->getLevel()->getName()) {
 			if ($this->world) {
+				$this->addFx([$from,$to]);
 				$this->owner->getServer()->broadcastMessage(
 					mc::_("%1% teleported to %2%",
 							$pl->getName(),
@@ -82,6 +93,7 @@ class BcTpMgr implements Listener {
 		if (!$this->local) return;
 		$dist = $from->distance($to);
 		if ($dist > $this->local) {
+			$this->addFx([$from,$to]);
 			$this->owner->getServer()->broadcastMessage(
 				mc::_("%1% teleported away!",$pl->getName()));
 		}

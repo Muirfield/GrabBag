@@ -26,14 +26,14 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\Player;
-use pocketmine\math\Vector3;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
+use aliuly\common\TPUtils;
 
 class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 	protected $leaders;
@@ -81,11 +81,7 @@ class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 				if (!MPMU::inGame($sender)) return true;
 				if (count($args) != 1) return false;
 				$n = array_shift($args);
-				$player = $this->owner->getServer()->getPlayer($n);
-				if (!$player) {
-					$sender->sendMessage(mc::_("%1% not found.",$n));
-					return true;
-				}
+				if (($player = MPMU::getPlayer($sender,$n)) === null) return true;
 				if (isset($this->followers[$s])) {
 					$sender->sendMessage(mc::_("You are no longer following %1%",
 														$this->followers[$s]));
@@ -109,11 +105,7 @@ class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 				if (!MPMU::inGame($sender)) return true;
 				if (count($args) == 0) return false;
 				foreach ($args as $n) {
-					$player = $this->owner->getServer()->getPlayer($n);
-					if (!$player) {
-						$sender->sendMessage(mc::_("%1% not found.",$n));
-						continue;
-					}
+					if (($player = MPMU::getPlayer($sender,$n)) === null) return true;
 					$this->stopFollowing($player);
 					$this->follow($player,$s);
 					$sender->sendMessage(mc::_("%1% is now following you",$n));
@@ -130,6 +122,7 @@ class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 		return false;
 	}
 	private function approach($f,$l) {
+		// "f=$f l=$l\n";//##DEBUG
 		if (!($f instanceof Player)) {
 			$f = $this->owner->getServer()->getPlayer($f);
 			if (!$f) return; // Couldn't find this guy!
@@ -142,21 +135,19 @@ class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 
 		if ($f->getLevel() === $l->getLevel()) {
 			$dist = $f->distance($l);
+			// $f->getName()." - ".$l->getName()." DIST:$dist\n";//##DEBUG
 			if ($dist < $this->maxdist) return; // Close enough
 		}
-		$pos = $l->getLevel()->getSafeSpawn(new Vector3($l->getX()+mt_rand(-$this->maxdist,$this->maxdist),
-								 $l->getY(),
-								 $l->getZ()+mt_rand(-$this->maxdist,$this->maxdist)));
-		$newdist = $pos->distance($l);
-		if ($newdist > $this->maxdist) return;// Will not get close enough!
-		$f->teleport($pos);
+		TPUtils::tpNearBy($f,$l,$this->maxdist,$this->maxdist);
 	}
 	//
 	// Event handlers
 	//
 	public function onPlayerQuit(PlayerQuitEvent $ev) {
+		//echo  __METHOD__.",".__LINE__."\n";//##DEBUG
 		$this->stopFollowing($ev->getPlayer());
 		$this->stopLeading($ev->getPlayer());
+		//echo  __METHOD__.",".__LINE__."\n";//##DEBUG
 	}
 	public function onPlayerMoveEvent(PlayerMoveEvent $ev) {
 		$n = MPMU::iName($ev->getPlayer());
@@ -208,6 +199,4 @@ class CmdFollowMgr extends BasicCli implements Listener,CommandExecutor {
 		}
 		unset($this->leaders[$leader]);
 	}
-
-	//
 }

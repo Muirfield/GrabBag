@@ -11,11 +11,11 @@ use pocketmine\command\Command;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\MoneyAPI;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\MoneyAPI;
+use aliuly\common\PermUtils;
 
 class CmdWhois extends BasicCli implements CommandExecutor {
 
@@ -65,7 +65,7 @@ class CmdWhois extends BasicCli implements CommandExecutor {
 			$txt[] = TextFormat::GREEN.mc::_("Flying: ").TextFormat::WHITE
 					 . ($target->isOnGround() ? mc::_("NO") : mc::_("YES"));
 			//1.5
-			if (MPMU::apiVersion("1.12.0")) {
+			if (MPMU::apiVersion("1.12.0")||MPMU::apiVersion("2.0.0")) {
 				$txt[] = TextFormat::GREEN.mc::_("UUID: ").TextFormat::WHITE
 						 . $target->getUniqueId();
 				$txt[] = TextFormat::GREEN.mc::_("ClientID: ").TextFormat::WHITE
@@ -86,6 +86,7 @@ class CmdWhois extends BasicCli implements CommandExecutor {
 
 		$txt[] = TextFormat::GREEN.mc::_("First Played: ").TextFormat::WHITE
 				 . date(mc::_("d-M-Y H:i"),$target->getFirstPlayed()/1000);
+		// $target->getLastPlayed()."\n";//##DEBUG
 		if ($target->getLastPlayed()) {
 			$txt[] = TextFormat::GREEN.mc::_("Last Played: ").TextFormat::WHITE
 					 . date(mc::_("d-M-Y H:i"),$target->getLastPlayed()/1000);
@@ -95,6 +96,7 @@ class CmdWhois extends BasicCli implements CommandExecutor {
 		if (($kr = $pm->getPlugin("KillRate")) !== null) {
 			if (version_compare($kr->getDescription()->getVersion(),"1.1") >= 0) {
 				if (intval($kr->getDescription()->getVersion()) == 2) {
+					echo get_class($kr->api)."\n";//##DEBUG
 					$score = $kr->api->getScore($target);
 				} else {
 					$score = $kr->getScore($target);

@@ -21,18 +21,18 @@ use pocketmine\command\Command;
 
 use pocketmine\utils\TextFormat;
 use pocketmine\item\Item;
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\ItemName;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\ItemName;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdGet extends BasicCli implements CommandExecutor {
 	// Override the MaxStacks counter...
 	static $stacks = [
 		Item::MINECART => 1, Item::BOOK => 1, Item::COMPASS => 1,
 		Item::CLOCK => 1, Item::SPAWN_EGG => 1, Item::FURNACE => 1,
-		Item::CHEST => 16, Item::TORCH => 16, Item::NETHER_REACTOR => 16,
+		Item::CHEST => 16, Item::TORCH => 16,
 	];
 
 	public function __construct($owner) {

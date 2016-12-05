@@ -18,10 +18,10 @@ use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdFreezeMgr extends BasicCli implements Listener,CommandExecutor {
 	protected $frosties;
@@ -50,6 +50,10 @@ class CmdFreezeMgr extends BasicCli implements Listener,CommandExecutor {
 			if (isset($this->frosties[$n])) unset($this->frosties[$n]);
 		}
   }
+	public function isFrozen($player) {
+		$n = strtolower($player->getName());
+		return isset($this->frosties[$n]);
+	}
   public function getFrosties() {
     return array_keys($this->frosties);
   }
@@ -90,15 +94,11 @@ class CmdFreezeMgr extends BasicCli implements Listener,CommandExecutor {
 				}
 
 				foreach ($args as $n) {
-					$player = $this->owner->getServer()->getPlayer($n);
-					if ($player) {
-						$this->frosties[strtolower($player->getName())] = $player->getName();
-						$player->sendMessage(mc::_("You have been frozen by %1%",
+					if (($player = MPMU::getPlayer($sender,$n)) === null) continue;
+					$this->frosties[strtolower($player->getName())] = $player->getName();
+					$player->sendMessage(mc::_("You have been frozen by %1%",
 															$sender->getName()));
-						$sender->sendMessage(mc::_("%1% is frozen.",$n));
-					} else {
-						$sender->sendMessage(mc::_("%1% not found.",$n));
-					}
+					$sender->sendMessage(mc::_("%1% is frozen.",$n));
 				}
 				return true;
 			case "thaw":
@@ -120,12 +120,13 @@ class CmdFreezeMgr extends BasicCli implements Listener,CommandExecutor {
 		return false;
 	}
 	public function onMove(PlayerMoveEvent $ev) {
+		//echo __METHOD__.",".__LINE__."\n";//##DEBUG
 		if ($ev->isCancelled()) return;
 		$p = $ev->getPlayer();
 		if (isset($this->frosties[strtolower($p->getName())])) {
 			if ($this->hard) {
 				$ev->setCancelled();
-				if (MPMU::apiVersion("1.12.0"))
+				if (MPMU::apiVersion("1.12.0")||MPMU::apiVersion("2.0.0"))
 					$p->sendTip(mc::_("You are frozen"));
 			} else {
 				// Lock position but still allow to turn around
@@ -133,7 +134,7 @@ class CmdFreezeMgr extends BasicCli implements Listener,CommandExecutor {
 				$to->yaw = $ev->getTo()->yaw;
 				$to->pitch = $ev->getTo()->pitch;
 				$ev->setTo($to);
-				if (MPMU::apiVersion("1.12.0"))
+				if (MPMU::apiVersion("1.12.0")||MPMU::apiVersion("2.0.0"))
 					$p->sendTip(mc::_("You are frozen in place"));
 			}
 		}

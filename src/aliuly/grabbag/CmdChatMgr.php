@@ -24,10 +24,10 @@ use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdChatMgr extends BasicCli implements Listener,CommandExecutor {
 	protected $chat;
@@ -142,11 +142,7 @@ class CmdChatMgr extends BasicCli implements Listener,CommandExecutor {
 						default:
 							if (count($args)) return false;
 							if (!MPMU::access($sender,"gb.cmd.togglechat.others")) return true;
-							$player = $this->owner->getServer()->getPlayer($n);
-							if ($player === null) {
-								$sender->sendMessage(mc::_("Unable to find %1%",$n));
-								return true;
-							}
+							if (($player = MPMU::getPlayer($sender,$n)) === null) return true;
 							if ($cmd->getName() == "chat-off") {
 								$this->setState($player, true);
 								$player->sendMessage(mc::_("Chat disabled from %1%",$sender->getName()));
@@ -174,6 +170,7 @@ class CmdChatMgr extends BasicCli implements Listener,CommandExecutor {
 	}
 
 	public function onChat(PlayerChatEvent $ev) {
+		//echo __METHOD__.",".__LINE__."\n";//##DEBUG
 		if ($ev->isCancelled()) return;
 		$p = $ev->getPlayer();
 		if ($p->hasPermission("gb.cmd.togglechat.excempt")) return; // Can always chat!

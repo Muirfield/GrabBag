@@ -12,12 +12,12 @@ use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\level\Position;
-use pocketmine\math\Vector3;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
+use aliuly\common\TPUtils;
 
 class CmdSummon extends BasicCli implements CommandExecutor {
 
@@ -46,18 +46,13 @@ class CmdSummon extends BasicCli implements CommandExecutor {
 	public function cmdSummon(CommandSender $c,$args) {
 		if (count($args) == 0) return false;
 		if (!MPMU::inGame($c)) return true;
-		$pl = $this->owner->getServer()->getPlayer($args[0]);
-		if (!$pl) {
-			$c->sendMessage(mc::_("%1% can not be found.",$args[0]));
-			return true;
-		}
+		if (($pl = MPMU::getPlayer($c,$args[0])) === null) return true;
 		array_shift($args);
 		if (count($args)) {
 			$pl->sendMessage(implode(" ",$args));
 		} else {
 			$pl->sendMessage(mc::_("You have been summoned by %1%",$c->getName()));
 		}
-
 		// Do we need to save current location?
 		$state = $this->getState($c,[]);
 		$pn = strtolower($pl->getName());
@@ -66,11 +61,9 @@ class CmdSummon extends BasicCli implements CommandExecutor {
 												$pl->getLevel());
 		}
 		$this->setState($c,$state);
-		$mv = new Vector3($c->getX()+mt_rand(-3,3),$c->getY(),
-								$c->getZ()+mt_rand(-3,3));
-		$c->sendMessage(mc::_("Summoning %1%....",$pn));
 
-		$pl->teleport($c->getLevel()->getSafeSpawn($mv));
+		$c->sendMessage(mc::_("Summoning %1%....",$pn));
+		TPUtils::tpNearBy($pl,$c);
 		return true;
 	}
 	public function cmdDismiss(CommandSender $c,$args) {
@@ -87,9 +80,8 @@ class CmdSummon extends BasicCli implements CommandExecutor {
 		if ($args[0] == "--all") $args = array_keys($state);
 
 		foreach ($args as $i) {
-			$pl = $this->owner->getServer()->getPlayer($i);
+			$pl = MPMU::getPlayer($c, $i);
 			if (!$pl) {
-				$c->sendMessage(mc::_("%1% can not be found.",$i));
 				$i = strtolower($i);
 				if (isset($state[$i])) unset($state[$i]);
 				continue;

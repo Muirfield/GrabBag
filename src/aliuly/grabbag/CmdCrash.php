@@ -22,9 +22,9 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\utils\TextFormat;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\PermUtils;
 
 class CmdCrash extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
@@ -110,6 +110,7 @@ class CmdCrash extends BasicCli implements CommandExecutor {
 			array_unshift($txt,TextFormat::RED.
 							  mc::_("Multiple matches, showing first match!"));
 		}
+		print_r($txt);
 		return $this->paginateText($c,$pageNumber,$txt);
 	}
 }

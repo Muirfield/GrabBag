@@ -10,10 +10,10 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\math\Vector3;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdThrow extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
@@ -26,7 +26,7 @@ class CmdThrow extends BasicCli implements CommandExecutor {
 								"permission" => "gb.cmd.throw"]);
 	}
 	public function throwPlayer($pl) {
-		if (MPMU::apiVersion("1.12.0")) {
+	   if (MPMU::apiVersion("1.12.0"||MPMU::apiVersion("2.0.0"))) {
 			$pl->teleport(new Vector3($pl->getX(),128,$pl->getZ()));
 		} else {
 			$force = 64;
@@ -40,11 +40,7 @@ class CmdThrow extends BasicCli implements CommandExecutor {
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
 		if ($cmd->getName() != "throw") return false;
 		if (count($args) > 2 || count($args) == 0) return false;
-		$pl = $this->owner->getServer()->getPlayer($args[0]);
-		if (!$pl) {
-			$sender->sendMessage(mc::_("%1% not found",$args[0]));
-			return true;
-		}
+		if (($pl = MPMU::getPlayer($sender,$args[0])) === null) return true;
 		$this->throwPlayer($pl);
 		return true;
 	}

@@ -15,10 +15,10 @@ use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 
-use aliuly\grabbag\common\BasicCli;
-use aliuly\grabbag\common\mc;
-use aliuly\grabbag\common\MPMU;
-use aliuly\grabbag\common\PermUtils;
+use aliuly\common\BasicCli;
+use aliuly\common\mc;
+use aliuly\common\MPMU;
+use aliuly\common\PermUtils;
 
 class CmdReOp extends BasicCli implements Listener,CommandExecutor {
 	protected $reops;
@@ -62,11 +62,7 @@ class CmdReOp extends BasicCli implements Listener,CommandExecutor {
 			$other = false;
 		} else {
 			if (!MPMU::access($sender,"gb.cmd.".$cmd->getName().".others")) return true;
-			$target = $this->owner->getServer()->getPlayer($args[0]);
-			if ($target === null) {
-				$sender->sendMessage(mc::_("%1% can not be found.",$args[0]));
-				return true;
-			}
+			if (($target = MPMU::getPlayer($sender, $args[0])) == null) return true;
 			$other = true;
 		}
     $n = strtolower($target->getName());
@@ -96,10 +92,12 @@ class CmdReOp extends BasicCli implements Listener,CommandExecutor {
 		return true;
 	}
 	public function onQuit(PlayerQuitEvent $ev) {
+		//echo __METHOD__.",".__LINE__."\n";//##DEBUG
     $n = strtolower($ev->getPlayer()->getName());
     if (!isset($this->reops[$n])) return;
     unset($this->reops[$n]);
     if ($ev->getPlayer()->isOp()) return;
     $ev->getPlayer()->setOp(true);
+		//echo __METHOD__.",".__LINE__."\n";//##DEBUG
   }
 }
