@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/alejandroliu/pocketmine-plugins/master/Media/GrabBag-icon.png" style="width:64px;height:64px" width="64" height="64"/>
+<img src="https://github.com/Muirfield/GrabBag/raw/master/media/GrabBag-icon.png" style="width:64px;height:64px" width="64" height="64"/>
 
 <!-- meta:Categories = General -->
 <!-- meta:PluginAccess = Internet Services, Other Plugins, Manages Permissions, Commands, Data Saving, Entities, Tile Entities, Manages Plugins -->
@@ -13,7 +13,7 @@
 - OptionalPlugins: FastTransfer
 - Categories: General 
 - Plugin Access: Internet Services, Other Plugins, Manages Permissions, Commands, Data Saving, Entities, Tile Entities, Manages Plugins 
-- WebSite: https://github.com/alejandroliu/pocketmine-plugins/tree/master/GrabBag
+- WebSite: https://github.com/Muirfield/GrabBag
 
 <!-- end-include -->
 
@@ -22,22 +22,15 @@
 <!-- php: $v_forum_thread = "http://forums.pocketmine.net/threads/grabbag.7524/"; -->
 <!-- template: prologue.md -->
 
-**DO NOT POST QUESTION/BUG-REPORTS/REQUESTS IN THE REVIEWS**
-
-It is difficult to carry a conversation in the reviews.  If you
-have a question/bug-report/request please use the
-[Thread](http://forums.pocketmine.net/threads/grabbag.7524/) for
-that.  You are more likely to get a response and help that way.
-
 _NOTE:_
 
 This documentation was last updated for version **2.3.0**.
 
 Please go to
-[github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/GrabBag)
+[github](https://github.com/Muirfield/GrabBag)
 for the most up-to-date documentation.
 
-You can also download this plugin from this [page](https://github.com/alejandroliu/pocketmine-plugins/releases/tag/GrabBag-2.3.0).
+You can also download this plugin from this [page](https://github.com/Muirfield/GrabBag/releases).
 
 <!-- end-include -->
 
@@ -763,13 +756,8 @@ languages currently available are:
 
 You can provide your own message file by creating a file called
 **messages.ini** in the plugin config directory.
-Check [github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/GrabBag/resources/messages/)
+Check [github](https://github.com/Muirfield/GrabBag/tree/master/resources/messages)
 for sample files.
-Alternatively, if you have
-[GrabBag](http://forums.pocketmine.net/plugins/grabbag.1060/) v2.3
-installed, you can create an empty **messages.ini** using the command:
-
-     pm dumpmsgs GrabBag [lang]
 
 <!-- end-include -->
 
