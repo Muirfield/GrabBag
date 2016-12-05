@@ -1,13 +1,7 @@
 <?php
-/**
- ** OVERVIEW:Informational
- **
- ** COMMANDS
- **
- ** * whois : Gives detail information on players
- **   usage: **whois** _<player>_
- **
- **/
+//= cmd:whois,Informational
+//: Gives detailed information on players
+//> usage: **whois** _<player>_
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -21,11 +15,14 @@ use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\MPMU;
 use aliuly\grabbag\common\MoneyAPI;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdWhois extends BasicCli implements CommandExecutor {
 
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.whois", "view players details", "op");
+		PermUtils::add($this->owner, "gb.cmd.whois.showip", "view players IP address", "op");
 		$this->enableCmd("whois",
 							  ["description" => mc::_("show players detail info"),
 								"usage" => "/whois <player>",
@@ -97,13 +94,20 @@ class CmdWhois extends BasicCli implements CommandExecutor {
 		$pm = $this->owner->getServer()->getPluginManager();
 		if (($kr = $pm->getPlugin("KillRate")) !== null) {
 			if (version_compare($kr->getDescription()->getVersion(),"1.1") >= 0) {
-				$score = $kr->getScore($target);
+				if (intval($kr->getDescription()->getVersion()) == 2) {
+					$score = $kr->api->getScore($target);
+				} else {
+					$score = $kr->getScore($target);
+				}
 				if ($score)
 					$txt[] = TextFormat::GREEN.mc::_("KillRate Score: ").TextFormat::WHITE.$score;
 			} else {
 				$txt[] = TextFormat::RED.mc::_("KillRate version is too old (%1%)",
 														 $kr->getDescription()->getVersion());
 			}
+		}
+		if (($pp = $pm->getPlugin("PurePerms")) !== null) {
+			$txt[] = TextFormat::GREEN.mc::_("PurePerms Group: ").TextFormat::WHITE.$pp->getUser($target)->getGroup()->getName();
 		}
 		if (($sa = $pm->getPlugin("SimpleAuth")) !== null) {
 			if ($target instanceof Player) {

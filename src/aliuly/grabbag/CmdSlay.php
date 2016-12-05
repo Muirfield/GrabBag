@@ -1,15 +1,8 @@
 <?php
-/**
- ** OVERVIEW:Trolling
- **
- ** COMMANDS
- **
- ** * slay : Kills the specified player
- **   usage: **slay** _<player>_ _[msg]_
- **
- **   Kills a player with an optional `message`.
- **
- **/
+//= cmd:slay,Trolling
+//: Kills the specified player
+//> usage: **slay** _<player>_ _[messsage]_
+//: Kills a player with an optional _message_.
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -22,16 +15,28 @@ use pocketmine\utils\TextFormat;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdSlay extends BasicCli implements CommandExecutor,Listener {
 
 	public function __construct($owner) {
 		parent::__construct($owner);
 		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
+
+		PermUtils::add($this->owner, "gb.cmd.slay", "Allow slaying players", "op");
+
 		$this->enableCmd("slay",
 							  ["description" => mc::_("kill a player with optional message"),
 								"usage" => mc::_("/slay <player> [message]"),
 								"permission" => "gb.cmd.slay"]);
+	}
+	public function slay($victim, $msg = "") {
+		if ($msg == "") {
+			$this->unsetState($victim);
+		} else {
+			$this->setState($victim,[time(),$msg]);
+		}
+		$victim->setHealth(0);
 	}
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
 		if ($cmd->getName() != "slay") return false;
@@ -44,12 +49,7 @@ class CmdSlay extends BasicCli implements CommandExecutor,Listener {
 			$sender->sendMessage(mc::_("Player %1% not found",$n));
 			return true;
 		}
-		if (count($args)) {
-			$this->setState($victim,[time(),implode(" ",$args)]);
-		} else {
-			$this->unsetState($victim);
-		}
-		$victim->setHealth(0);
+		$this->slay($victim,implode(" ",$args));
 		$sender->sendMessage(TextFormat::RED.mc::_("%1% has been slain.",$victim->getName()));
 		return true;
 	}

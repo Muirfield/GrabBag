@@ -1,22 +1,18 @@
 <?php
-/**
- ** OVERVIEW:Inventory Management
- **
- ** COMMANDS
- **
- ** * get : obtain an item
- **   usage: **get** _<item>_ _[count]_
- **
- **   This is a shortcut to `/give` that lets player get items for
- **   themselves.  You can replace **item** with **more** and the
- **   current held item will be duplicated.
- **
- ** * gift : give an item to a player
- **   usage: **gift** _[player]_ _<item>_ _[count]_
- **
- **   This is a re-implementation of `/give`.
- **
- **/
+//= cmd:get,Inventory_Management
+//: obtain an item
+//> usage: **get** _<item>_ _[count]_
+//:
+//: This is a shortcut to **give** that lets player get items for
+//: themselves.  You can replace **item** with **more** and the
+//: current held item will be duplicated.
+
+//= cmd:gift,Inventory_Management
+//: give an item to a player
+//> usage: **gift** _[player]_ _<item>_ _[count]_
+//:
+//: This is a re-implementation of **give** command.
+
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -29,6 +25,7 @@ use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\ItemName;
 use aliuly\grabbag\common\MPMU;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdGet extends BasicCli implements CommandExecutor {
 	// Override the MaxStacks counter...
@@ -40,6 +37,7 @@ class CmdGet extends BasicCli implements CommandExecutor {
 
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.get", "get blocks", "op");
 		$this->enableCmd("get",
 							  ["description" => mc::_("Shortcut to /give me"),
 								"usage" => mc::_("/get <item[:damage]> [amount]"),

@@ -1,15 +1,10 @@
 <?php
-/**
- ** OVERVIEW:Player Management
- **
- ** COMMANDS
- **
- ** * shield : player is protected from taking damage
- **   usage: **shield**
- **
- **   This will toggle your shield status.
- **
- **/
+//= cmd:shield,Player_Management
+//: player is protected from taking damage
+//> usage: **shield**
+//:
+//: This will toggle your shield status.
+
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -23,15 +18,28 @@ use pocketmine\Player;
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\MPMU;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdShieldMgr extends BasicCli implements Listener,CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
+
+		PermUtils::add($this->owner, "gb.cmd.shield", "Allow players to become invulnverable", "op");
 		$this->enableCmd("shield",
 							  ["description" => mc::_("makes player invulnerable"),
 								"usage" => mc::_("/shield"),
 								"permission" => "gb.cmd.shield"]);
 		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
+	}
+	public function isShielded($player) {
+		return $this->getState($player,false);
+	}
+	public function setShield($player, $mode) {
+		if ($mode) {
+			$this->setState($player,true);
+		} else {
+			$this->unsetState($player);
+		}
 	}
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
 		if (count($args) !== 0) return false;
@@ -40,7 +48,7 @@ class CmdShieldMgr extends BasicCli implements Listener,CommandExecutor {
 		$state = $this->getState($sender,false);
 		if ($state) {
 			$sender->sendMessage(mc::_("Shields DOWN"));
-			$this->setState($sender,false);
+			$this->unsetState($sender);
 		} else {
 			$sender->sendMessage(mc::_("Shields UP"));
 			$this->setState($sender,true);

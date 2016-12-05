@@ -1,21 +1,15 @@
 <?php
-/**
- ** OVERVIEW:Player Management
- **
- ** COMMANDS
- **
- ** * perm : temporarily change player's permissions
- **   usage: **perm** _<player>_ _<dump|permission> _[true|false]_
- **
- **   This can be used to temporarily change player's permissions.
- **   Changes are only done in-memory, so these will revert if the
- **   disconnects or the server reloads.
- **   You can specify a _permission_ and it will show it's valueor
- **   if true|false is specified it will be changed.
- **   If you specify **dump**, it will show all permissions
- **   associated to a player.
- **
- **/
+//= cmd:perm,Player_Management
+//: temporarily change player's permissions
+//> usage: **perm** _<player>_ _<dump|permission>_ _[true|false]_
+//:
+//: This can be used to temporarily change player's permissions.
+//: Changes are only done in-memory, so these will revert if the
+//: disconnects or the server reloads.
+//: You can specify a _permission_ and it will show it's value or
+//: if true|false is specified it will be changed.
+//: If you specify **dump**, it will show all permissions
+//: associated to a player.
 
 namespace aliuly\grabbag;
 
@@ -29,6 +23,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdPermMgr extends BasicCli implements CommandExecutor,Listener {
 	protected $perms;
@@ -36,10 +31,14 @@ class CmdPermMgr extends BasicCli implements CommandExecutor,Listener {
 	public function __construct($owner) {
 		parent::__construct($owner);
 		$this->perms = [];
+
+		PermUtils::add($this->owner, "gb.cmd.permmgr", "Manipulate Permissions", "op");
+
 		$this->enableCmd("perm",
 							  ["description" => mc::_("change permissions"),
 								"usage" => mc::_("/perm <player> <dump|permission> [true|false]"),
 								"permission" => "gb.cmd.permmgr"]);
+		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
 	}
 	public function onQuit(PlayerQuitEvent $ev) {
 		$pl = $ev->getPlayer();

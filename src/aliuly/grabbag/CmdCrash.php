@@ -1,24 +1,18 @@
 <?php
-/**
- ** OVERVIEW:Server Management
- **
- ** COMMANDS
- **
- ** * crash : manage crash dumps
- **   usage: **crash** _[ls|clean|show]_
- **
- **   Will show the number of `crash` files in the server.
- **   The following optional sub-commands are available:
- **   - **crash** **count**
- **     - Count the number of crash files
- **   - **crash** **ls** _[patthern]_
- **     - List crash files
- **   - **crash** **clean** _[pattern]_
- **     - Delete crash files
- **   - **show** _[pattern]_
- **     - Shows the crash file ##
- **
- **/
+//= cmd:crash,Server_Management
+//: manage crash dumps
+//> usage: **crash** _[ls|clean|show]_
+//:
+//: Will show the number of **crash** files in the server.
+//: The following optional sub-commands are available:
+//: - **crash** **count**
+//:   - Count the number of crash files
+//: - **crash** **ls** _[pattern]_
+//:   - List crash files
+//: - **crash** **clean** _[pattern]_
+//:   - Delete crash files
+//: - **show** _[pattern]_
+//:   - Shows the crash file ##
 
 namespace aliuly\grabbag;
 
@@ -30,10 +24,12 @@ use pocketmine\utils\TextFormat;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdCrash extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.crash", "crash dump management", "op");
 		$this->enableCmd("crash",
 							  ["description" => mc::_("manage crash files"),
 								"usage" => mc::_("/crash [count|clean|show|ls]"),

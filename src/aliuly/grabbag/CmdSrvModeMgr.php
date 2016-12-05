@@ -1,17 +1,11 @@
 <?php
-/**
- ** OVERVIEW:Server Management
- **
- ** COMMANDS
- **
- ** * servicemode : controls servicemode
- **   usage: **servicemode** **[on|off** _[message]_ **]**
- **
- **   If `on` it will activate service mode.  In service mode new
- **   players can not join (unless they are ops).  Existing players
- **   can remain but may be kicked manually by any ops.
- **
- **/
+//= cmd:servicemode,Server_Management
+//: controls servicemode
+//> usage: **servicemode** **[on|off** _[message]_ **]**
+//:
+//: If **on** it will activate service mode.  In service mode new
+//: players can not join (unless they are ops).  Existing players
+//: can remain but may be kicked manually by any ops.
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -26,12 +20,17 @@ use pocketmine\utils\TextFormat;
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\PluginCallbackTask;
+use aliuly\grabbag\common\PermUtils;
+
 
 class CmdSrvModeMgr extends BasicCli implements CommandExecutor,Listener {
 	protected $mode;
 	static $delay = 5;
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.servicemode", "service mode command", "op");
+		PermUtils::add($this->owner, "gb.servicemode.allow", "login when in service mode", "op");
+
 		$this->enableCmd("servicemode",
 							  ["description" => mc::_("Enter/Exit servicemode"),
 								"usage" => mc::_("/servicemode [on|off [message]]"),
@@ -40,11 +39,20 @@ class CmdSrvModeMgr extends BasicCli implements CommandExecutor,Listener {
 		$this->owner->getServer()->getPluginManager()->registerEvents($this, $this->owner);
 		$this->mode = false;
 	}
+	public function getServiceMode() {
+		return $this->mode;
+	}
+	public function setServiceMode($msg) {
+		$this->mode = $msg;
+	}
+	public function unsetServiceMode() {
+		$this->mode = false;
+	}
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
 		if ($cmd->getName() != "servicemode") return false;
 		if (count($args) == 0) {
-			if ($this->mode !== false) {
-				$sender->sendMessage(TextFormat::RED.mc::_("In Service Mode: %1%",$this->mode));
+			if ($this->getServiceMode() !== false) {
+				$sender->sendMessage(TextFormat::RED.mc::_("In Service Mode: %1%",$this->getServiceMode()));
 			} else {
 				$sender->sendMessage(TextFormat::GREEN.mc::_("In Normal operating mode"));
 			}
@@ -55,11 +63,11 @@ class CmdSrvModeMgr extends BasicCli implements CommandExecutor,Listener {
 			if (!$msg) $msg = mc::_("Scheduled maintenance");
 			$this->owner->getServer()->broadcastMessage(TextFormat::RED.mc::_("ATTENTION: Entering service mode"));
 			$this->owner->getServer()->broadcastMessage(TextFormat::YELLOW." - ".$msg);
+			$this->setServiceMode($msg);
 		} else {
-			$msg = false;
 			$this->owner->getServer()->broadcastMessage(TextFormat::GREEN.mc::_("ATTENTION: Leaving service mode"));
+			$this->unsetServiceMode();
 		}
-		$this->mode = $msg;
 		return true;
 	}
 	//

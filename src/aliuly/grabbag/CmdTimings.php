@@ -1,18 +1,13 @@
 <?php
-/**
- ** OVERVIEW:Informational
- **
- ** COMMANDS
- **
- ** * showtimings: Shows timing repots as reported by `/timings`
- **   usage: **timings** _[t#]_
- **
- **   If nothing specified it will list available reports.  These are
- **   of the form of `timings.txt` or `timings1.txt`.
- **
- **   To specify a report enter `t` for `timings.txt` or `t1` for
- **   `timings1.txt`.
- **/
+//= cmd:showtimings,Informational
+//: Shows timing repots as reported by **timings**
+//> usage: **timings** _[t#]_
+//:
+//: If nothing specified it will list available reports.  These are
+//: of the form of **timings.txt** or `timings1.txt`.
+//:
+//: To specify a report enter **t** for **timings.txt** or **t1** for
+//: **timings1.txt**.
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -23,10 +18,12 @@ use pocketmine\utils\TextFormat;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdTimings extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.timings", "view timings report", "op");
 		$this->enableCmd("showtimings",
 							  ["description" => mc::_("Show timings data (see /timings)"),
 								"usage" => mc::_("/showtimings [t#]"),

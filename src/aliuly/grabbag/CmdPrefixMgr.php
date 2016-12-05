@@ -1,21 +1,18 @@
 <?php
-/**
- ** OVERVIEW:Player Management
- **
- ** COMMANDS
- **
- ** * prefix : prepend prefix to chat lines
- **   usage: **prefix** _[-n]_ _<prefix text>_
- **
- **   This allows you to prepend a prefix to chat lines.
- **   To stop enter `/prefix` by itself (or `prefix` at the console).
- **   Usage examples:
- **
- **   - Send multiple `/as player` commands in a row.
- **   - Start a private chat `/tell player` with another player.
- **   - You prefer commands over chat: `-n /`
- **
- **/
+//= cmd:prefix,Player_Management
+//: prepend prefix to chat lines
+//> usage: **prefix** _[-n]_ _<prefix text>_
+//:
+//: This allows you to prepend a prefix to chat lines.
+//: To stop enter **/prefix** by itself (or **prefix** at the console).
+//: Usage examples:
+//:
+//: - Send multiple **/as player** commands in a row.
+//: - Start a private chat **/tell player** with another player.
+//: - You prefer commands over chat: **/prefix -n /**
+//:
+//: When prefix is enabled and you one to send just _one_ command without
+//: prefix, prepend your text with **<**.
 
 namespace aliuly\grabbag;
 
@@ -31,11 +28,14 @@ use pocketmine\event\server\ServerCommandEvent;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdPrefixMgr extends BasicCli implements CommandExecutor,Listener {
 	static $delay = 5;
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.prefix", "Prefix command", "true");
+
 		$this->enableCmd("prefix",
 							  ["description" => mc::_("Execute commands with prefix inserted"),
 								"usage" => mc::_("/prefix [-n] <text>"),
@@ -61,6 +61,7 @@ class CmdPrefixMgr extends BasicCli implements CommandExecutor,Listener {
 	private function processCmd($msg,$sender) {
 		$prefix = $this->getState($sender,"");
 		if ($prefix == "") return false;
+		if ($msg{0} == "<") return false; // Just this command we do it without prefix!
 		if ($sender instanceof Player) {
 			if (preg_match('/^\s*\/prefix\s*/',$msg)) return false;
 		} else {

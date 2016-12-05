@@ -1,18 +1,14 @@
 <?php
-/**
- ** OVERVIEW:Trolling
- **
- ** COMMANDS
- **
- ** * spectator|unspectator : toggle a player's spectator mode
- **   usage: **spectator|unspectator** _[player]_
- **
- **   `/spectator` will turn a player into an spectator.  In this mode
- **   players can move but not interact (i.e. can't take/give damage,
- **   can't place/break blocks, etc).
- **
- **   If no player was specified, it will list spectators.
- **/
+//= cmd:spectator|unspectator,Trolling
+//: toggle a player's spectator mode **(DEPRECATED)**
+//> usage: **spectator|unspectator** _[player]_
+//:
+//: This command will turn a player into an spectator.  In this mode
+//: players can move but not interact (i.e. can't take/give damage,
+//: can't place/break blocks, etc).
+//:
+//: If no player was specified, it will list spectators.
+
 
 namespace aliuly\grabbag;
 
@@ -30,12 +26,14 @@ use pocketmine\event\player\PlayerInteractEvent;
 
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdSpectator extends BasicCli implements CommandExecutor,Listener {
 	protected $watchers;
 
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.spectator", "Turn players into spectators", "op");
 		$this->enableCmd("spectator",
 							  ["description" => mc::_("Make player an spectator"),
 								"usage" => mc::_("/spectator [player]"),

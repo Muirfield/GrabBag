@@ -1,19 +1,20 @@
 <?php
-/**
- ** OVERVIEW:Player Management
- **
- ** COMMANDS
- **
- ** * gmc : Change your gamemode to _Creative_.
- **   usage: **gmc**
- ** * gms : Change your gamemode to _Survival_.
- **   usage: **gms**
- ** * gma : Change your gamemode to _Adventure_.
- **   usage: **gma**
- ** * gmspc : Change your gamemode to _Spectator_.
- **   usage: **gmspc**
- **
- **/
+//= cmd:gmc,Player_Management
+//: Change your gamemode to _Creative_.
+//> usage: **gmc**
+
+//= cmd:gms,Player_Management
+//: Change your gamemode to _Survival_.
+//> usage: **gms**
+
+//= cmd:gma,Player_Management
+//: Change your gamemode to _Adventure_.
+//> usage: **gma**
+
+//= cmd:gmspc,Player_Management
+//: Change your gamemode to _Spectator_.
+//> usage: **gmspc**
+
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -22,14 +23,20 @@ use pocketmine\command\Command;
 
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\MPMU;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdGmx extends BasicCli implements CommandExecutor {
 
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.gma", "Switch gamemode to Adventure", "op");
+		PermUtils::add($this->owner, "gb.cmd.gms", "Switch gamemode to Survival", "op");
+		PermUtils::add($this->owner, "gb.cmd.gmc", "Switch gamemode to Creative", "op");
+		PermUtils::add($this->owner, "gb.cmd.gmspc", "Switch gamemode to Spectator", "op");
 		$this->enableCmd("gmc",
 							  ["description" => mc::_("switch gamemode to creative"),
 								"usage" => mc::_("/gmc"),

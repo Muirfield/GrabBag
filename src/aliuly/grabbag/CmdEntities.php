@@ -1,33 +1,29 @@
 <?php
-/**
- ** OVERVIEW:Entity Management
- **
- ** COMMANDS
- **
- ** * entities : entity management
- **   usage: **entities** _[subcommand]_ _[options]_
- **
- **   By default it will show the current entities.  The following
- **   sub-commands are available:
- **   - **entities** **ls** _[world]_
- **      - Show entities in _[world]_ (or current world if not specified).
- **   - **entities** **tiles** _[world]_
- **      - Show tile entities in _[world]_ (or current world if not specified).
- **   - **entities** **info** _[e#|t#]_
- **     - Show details about one or more entities or tiles.
- **   - **entities** **rm** _[e#]_
- **     - Removes one or more entities.
- **   - **entities** **sign**_N_ _[t#]_ _message text_
- **     - Changes the text line _N_ in the tile/sign identified by _t#_.
- **   - **entities** **count**
- **     - Show a count of the number of entities on the server.
- **   - **entities** **nuke** _[all|mobs|others]_
- **     -Clear entities from the server.
- **
- **   Additionally, tiles can be specified by providing the following:
- **
- **   - t(x),(y),(z)[,world]
- **/
+//= cmd:entities,Entity_Management
+//: entity management
+//> usage: **entities** _[subcommand]_ _[options]_
+//:
+//: By default it will show the current entities.  The following
+//: sub-commands are available:
+//> - **entities** **ls** _[world]_
+//:    - Show entities in _[world]_ (or current world if not specified).
+//> - **entities** **tiles** _[world]_
+//:    - Show tile entities in _[world]_ (or current world if not specified).
+//> - **entities** **info** _[e#|t#]_
+//:    - Show details about one or more entities or tiles.
+//: - **entities** **rm** _[e#]_
+//:    - Removes one or more entities.
+//: - **entities** **sign**_N_ _[t#]_ _message text_
+//:    - Changes the text line _N_ in the tile/sign identified by _t#_.
+//: - **entities** **count**
+//:    - Show a count of the number of entities on the server.
+//: - **entities** **nuke** _[all|mobs|others]_
+//:    - Clear entities from the server.
+//:
+//: Additionally, tiles can be specified by providing the following:
+//:
+//: - t(x),(y),(z)[,world]
+
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -45,11 +41,12 @@ use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\MPMU;
 use aliuly\grabbag\common\ItemName;
-
+use aliuly\grabbag\common\PermUtils;
 
 class CmdEntities extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.entities", "entity management", "op");
 		$this->enableCmd("entities",
 							  ["description" => mc::_("Manage entities"),
 								"usage" => mc::_("/entities [tile|info|rm|sign#|count|nuke] [args]"),

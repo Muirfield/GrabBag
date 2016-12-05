@@ -1,15 +1,11 @@
 <?php
-/**
- ** OVERVIEW:Teleporting
- **
- ** COMMANDS
- **
- ** * pushtp : Saves current location and teleport
- **   usage: **pushtp** _<player>_ _[target]_
- ** * poptp : Returns to the previous location
- **   usage: **poptp**
- **
- **/
+//= cmd:pushtp,Teleporting
+//: Saves current location and teleport
+//> usage: **pushtp** _<player>_ _[target]_
+
+//= cmd:poptp,Teleporting
+//: Returns to the previous location
+//> usage: **poptp**
 namespace aliuly\grabbag;
 
 use pocketmine\command\CommandExecutor;
@@ -21,11 +17,13 @@ use pocketmine\math\Vector3;
 use aliuly\grabbag\common\BasicCli;
 use aliuly\grabbag\common\mc;
 use aliuly\grabbag\common\MPMU;
+use aliuly\grabbag\common\PermUtils;
 
 class CmdTpStack extends BasicCli implements CommandExecutor {
 
 	public function __construct($owner) {
 		parent::__construct($owner);
+		PermUtils::add($this->owner, "gb.cmd.pushpoptp", "position stack", "op");
 		$this->enableCmd("pushtp",
 							  ["description" => mc::_("Save your current position when teleporting"),
 								"usage" => mc::_("/pushtp [player|position|world]"),
@@ -45,7 +43,7 @@ class CmdTpStack extends BasicCli implements CommandExecutor {
 		return false;
 	}
 
-	private function cmdPushTp(CommandSender $c,$args) {
+	public function cmdPushTp(CommandSender $c,$args) {
 		if (!MPMU::inGame($c)) return true;
 
 		// Determine target...
@@ -100,7 +98,7 @@ class CmdTpStack extends BasicCli implements CommandExecutor {
 		}
 		return true;
 	}
-	private function cmdPopTp(CommandSender $c,$args) {
+	public function cmdPopTp(CommandSender $c,$args) {
 		if (!MPMU::inGame($c)) return true;
 		if (count($args)) return false;
 
