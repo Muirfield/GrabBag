@@ -1,5 +1,4 @@
-GrabBag
-=======
+# GrabBag
 
 * Summary: A miscellaneous colletion of commands and listener modules
 * Dependency Plugins: n/a
@@ -10,48 +9,84 @@ GrabBag
 * Plugin Access: Commands
 * WebSite: [github](https://github.com/alejandroliu/pocketmine-plugins/tree/master/GrabBag)
 
-Overview
---------
+## Overview
 
 A miscellaneous collection of commands and listener modules.  Features
 can be configured to be disable|enable so as to co-exists with other
 plugins.
 
+This plugin is focused more towards commands to help system
+administration.
 
-Basic Usage:
+### Entity Management
 
-* players - show players and their locations
-* ops - show ops
-* as - run command as somebody else
-* gms - Switch to survival mode
-* gmc - Switch to creative mode
-* gma - Switch to adventure mode
-* slay - kill a player
-* heal - Restore health to a player *unable to test*
-* whois - Info about a player
-* showtimings - Display the info gathered through /timings
-* seearmor - show player's armor *broken in 1.5*
-* seeinv - show player's inventory
-* clearinv - Clear player's inventory
-* get - obtain an item
-* shield [up|down] - Protect a player
-* servicemode [on|off] - enter maintenance mode
-* opms [msg] - send op only chat messages
-* entities - manage entities
-* mute/unmute [player] - mute players
-* freeze/thaw [player] - freeze players
-* after [secs] cmd - Schedule command
-* at [timespec] cmd - Schedule command
-* rpt [message] - report issues to ops
-* summon <player> [msg] - teleports <player> to you.
-* dismiss <player> [msg] - teleports <player> back to where they were
-  summoned.
-* pushtp <x y z|player|world> - save current location and teleport
-* poptp - goes back to saved location
-* !! - repeat command with changes
+* entities : entity management
 
-Documentation
--------------
+### Informational
+
+* ops : Shows who are the ops on this server.
+* players : Shows what players are on-line
+* showtimings : Shows timing repots as reported by `/timings`
+* whois : Gives detail information on players
+
+### Inventory Management
+
+* clearinv : Clear player's inventory
+* get : obtain an item
+* seearmor : Show player's armor
+* seeinv : Show player's inventory
+* setarmor : Sets armor (even in creative)
+
+### Player Management
+
+* as : run command as somebody else
+* gma : Change your gamemode to _Adventure_.
+* gmc : Change your gamemode to _Creative_.
+* gms : Change your gamemode to _Survival_.
+* prefix : prepend prefix to chat lines
+* shield : player is protected from taking damage
+
+### Server Management
+
+* after : schedule command after a number of seconds
+* at : schedule command at an appointed date/time
+* opms : sends a message to ops only
+* rcon : rcon client
+* rpt : report an issue to ops
+* servicemode : controls servicemode
+
+### Teleporting
+
+* dismiss : Dismiss a previously summoned player
+* follow : Follow a player
+* follow-off : stop following a player
+* followers : List who is following who
+* followme : Make a player follow you
+* followme-off : stop making a player follow you
+* poptp : Returns to the previous location
+* pushtp : Saves current location and teleport
+* spawn : Teleport player to spawn point
+* summon : Summons a player to your location
+
+### Trolling
+
+* blowup : explode a player
+* burn : Burns the specified player
+* freeze|thaw : freeze/unfreeze a player so they cannot move.
+* heal : Restore health to a player
+* mute|unmute : mutes/unmutes a player so they can not use chat
+* slay : Kills the specified player
+* spectator|unspectator : toggle a player's spectator mode
+* throw : Throw a player in the air
+
+### Modules
+
+* join-mgr : Announce joining ops, and show server motd
+* repeater : Uses `!!` to repeat command with changes
+
+## Documentation
+
+**NOTE: In v2.0.0 Configuration has been changed**
 
 This plugin collects a number of commands and listener plugins that I
 find useful and wanted to have in a single plugin rather through
@@ -59,93 +94,244 @@ multiple ones.  The available commands and listener modules can be
 configured.  This allows this plugin to co-exist peacefully with other
 plugins.
 
-### Commands:
+### Command Reference
 
-* *players*  
-  Show connected players and locations, health.
-* *ops*  
-  Display a list of Server Ops and their on-line status.
-* *as* *player* *cmd* _[opts]_  
-  Run *cmd* as a different *player*.  If you want to send a `chat`
-  line as *player* use `chat` for *cmd*.
-* *gms*  
-  Switch to survival game mode
-* *gmc*  
-  Switch to creative game mode
-* *gma*  
-  Switch to adventure game mode
-* *slay* *player* _[message]_  
-  Kills a player immediatly
-* *heal* _[player_ _[value]]_  
-  Restore health to a player
-* *whois* *player*  
-  Show player info
-* *showtimings* _[report|clear]_ _[page]_  
-  Show the timings data from the `/timings` command.
-* *seearmor* *player*  
-  Show player's armor
-* *seeinv* *player*  
-  Show player's inventory
-* *clearinv* *player*  
-  Clear player's inventory
-* *get* *item[:damage]* _[amount]_  
-  Obtain an *item*.  When the item name contain spaces in the name,
-  use `_` instead.
-* *shield* _[up|down]_  
-  Show shield status.  Or raise/lower shields.
-* *servicemode* _[on|off]_  _[message]_  
-  In servicemode, new connections are not allowed.  Existing users are
-  OK.  Ops (gb.servicemode.allow) can always login.
-* *opms* text  
-  Send a message that can only be seen by ops or by the console.  You
-  should use the *ops* command to see if there are any server ops
-  on-line.
-* *mute|unmute* _[player]_  
-  Stops players from chatting.  If no player specified it will show a
-  list of mutes.
-* *freeze|thaw* _[player]_  
-  Stops players from moving.  If no player specified it will show a
-  list of statues.
-* *at* *time* _[:]_ *command*  
+The following commands are available:
+
+* **after** _<seconds>_ _<command>_  
+  schedule command after a number of seconds  
+
+  Will schedule to run *command* after *seconds*
+
+* **as** _<player>_ _<command>_  
+  run command as somebody else  
+
+* **at** _<time>_ _[:]_ _command_  
+  schedule command at an appointed date/time  
+
   Will schedule to run *command* at the given date/time.  This uses
   php's [strtotime](http://php.net/manual/en/function.strtotime.php)
-  function so *times* must follow the format described in
+  function so _times_ must follow the format described in
   [Date and Time Formats](http://php.net/manual/en/datetime.formats.php).
-* *after* *seconds* *command*  
-  Will schedule to run *command* after *seconds*.
-* *entities* _level_ _subcommand_  
+
+* **blowup** _<player>_ _[yield]_ **[magic]** **[normal]**  
+  explode a player  
+
+  Explodes `player` with an explosion with the given `yield` (a number).
+  If `magic` is specified no damage will be taken by blocks.  The
+  default is `normal`, where blocks do get damaged.
+
+* **burn** _<player>_ _[secs]_  
+  Burns the specified player  
+
+  Sets `player` on fire for the specified number of seconds.
+  Default is 15 seconds.
+
+* **clearinv** _<player>_  
+  Clear player's inventory  
+
+* **dismiss** _<player>_ _[message]_  
+  Dismiss a previously summoned player  
+
+* **entities** _[subcommand_ _[options]_  
+  entity management  
+
   By default it will show the current entities.  The following
   sub-commands are available:
-  * *tiles*  
-    Show tile entities
-  * *info* _[e#|t#]_  
-    Show details about one or more entities or tiles.
-  * *rm* _[e#]_  
-    Removes one or more entities.
-  * *signN* _[t#]_ _message text_  
-    Changes the text line _N_ in the tile/sign identified by _t#_.
-* *rpt* _[text]_
-  Report issues to server ops.  Sub commands:
-  * read
-    Show messages
-  * clear _[m#|all]_
-    Clears messages
-* *summon* <player> [msg]  
-  teleports <player> to you.
-* *dismiss* <player> [msg]  
-  teleports <player> back to where they were summoned from.
-* *pushtp* <x y z|player|world>
-  save current location and teleport (if desired).
-* *poptp*
-  goes back to saved location.  Push and pop work in a stack.  Push
-  will save the current location on the top of the stack, while pop
-  will pop it from the top of the stack.
+  - **entities** **ls** _[world]_
+     - Show entities in _[world]_ (or current world if not specified).
+  - **entities** **tiles** _[world]_
+     - Show tile entities in _[world]_ (or current world if not specified).
+  - **entities** **info** _[e#|t#]_
+    - Show details about one or more entities or tiles.
+  - **entities** **rm** _[e#]_
+    - Removes one or more entities.
+  - **entities** **sign**_N_ _[t#]_ _message text_
+    - Changes the text line _N_ in the tile/sign identified by _t#_.
+  - **entities** **count**
+    - Show a count of the number of entities on the server.
+  - **entities** **nuke** _[all|mobs|others]_
+    -Clear entities from the server.
 
-Note that commands scheduled with `at` and `after` will only run as
+* **follow** _<player>_  
+  Follow a player  
+* **follow-off**  
+  stop following a player  
+* **followers**  
+  List who is following who  
+* **folowme** _<player>_  
+  Make a player follow you  
+* **followme-off** _<player>_  
+  stop making a player follow you  
+
+* **freeze|thaw** [_player_|**--hard|--soft**]  
+  freeze/unfreeze a player so they cannot move.  
+
+  Stops players from moving.  If no player specified it will show
+  the list of frozen players.
+
+  If `--hard` or `--soft` is specified instead of a player name, it
+  will change the freeze mode.
+
+* **get** _<item>_  
+  obtain an item  
+
+  This is a shortcut to `/give` that lets player get items for
+  themselves.
+
+* **gma**  
+  Change your gamemode to _Adventure_.  
+
+* **gmc**  
+  Change your gamemode to _Creative_.  
+* **gms**  
+  Change your gamemode to _Survival_.  
+* **heal** _[player]_ _[ammount]_  
+  Restore health to a player  
+
+  Heals a player.  If the amount is positive it will heal, if negative
+  the player will be hurt.  The units are in 1/2 hearts.
+
+* **mute|unmute** _[player]_  
+  mutes/unmutes a player so they can not use chat  
+
+  Stops players from chatting.  If no player specified it will show
+  the list of muted players.
+
+* **opms** _[msg]_  
+  sends a message to ops only  
+
+  Sends chat messages that are only see by ops.  Only works with ops
+  that are on-line at the moment.  If you no ops are on-line you
+  should use the `rpt` command.
+
+* **ops**  
+  Shows who are the ops on this server.  
+* **players**  
+  Shows what players are on-line  
+* **poptp**  
+  Returns to the previous location  
+
+* **prefix** _[-n]_ _<prefix text>_  
+  prepend prefix to chat lines  
+
+  This allows you to prepend a prefix to chat lines.
+  To stop enter `/prefix` by itself (or `prefix` at the console).
+  Usage examples:
+
+  - Send multiple `/as player` commands in a row.
+  - Start a private chat `/tell player` with another player.
+  - You prefer commands over chat: `-n /`
+
+* **pushtp** _<player>_ _[target]_  
+  Saves current location and teleport  
+* **rcon** **[--add|--rm|--ls|id]** _<command>_  
+  rcon client  
+
+  This is an rcon client that you can used to send commands to other
+  remote servers.  Options:
+  - **rcon --add** _<id>_ _<address>_ _<port>_ _<password>_ _[comments]_
+    - adds a `rcon` connection with `id`.
+  - **rcon --rm** _<id>_
+    - Removes `rcon` connection `id`.
+  - **rcon --ls**
+    - List configured rcon connections.
+  - **rcon** _<id>_ _<command>_
+    - Sends the `command` to the connection `id`.
+  should use the `rpt` command.
+
+* **rpt** [_message_|**read|clear** _<all|##>_]  
+  report an issue to ops  
+
+  Logs/reports an issue to server ops.  These issues are stored in a
+  a file which can be later read by the server operators.  Use this
+  when there are **no** ops on-line.  If there are ops on-line you
+  should use the `opms` command.
+
+  The following ops only commands are available:
+  - **rpt** **read** _[##]_
+    - reads reports.  You can specify the page by specifying a number.
+  - **rpt** **clear** _<all|##>_
+    - will delete the specified report or if `all`, all the reports.
+
+* **seearmor** _<player>_  
+  Show player's armor  
+
+* **seeinv** _<player>_  
+  Show player's inventory  
+* **servicemode** **[on|off** _[message]_ **]**  
+  controls servicemode  
+
+  If `on` it will activate service mode.  In service mode new
+  players can not join (unless they are ops).  Existing players
+  can remain but may be kicked manually by any ops.
+
+* **setarmor** _[player]_ _[piece]_ _<type>_  
+  Sets armor (even in creative)  
+
+  This command lets you armor up.  It can armor up creative players too.
+  If no `player` is given, the player giving the command will be armored.
+
+  Piece can be one of `head`, `body`, `legs`, or `boots`.
+
+  Type can be one of `leather`, `chainmail`, `iron`, `gold` or `diamond`.
+
+* **shield**  
+  player is protected from taking damage  
+
+  This will toggle your shield status.
+
+* **timings** _[t#]_  
+  Shows timing repots as reported by `/timings`  
+
+  If nothing specified it will list available reports.  These are
+  of the form of `timings.txt` or `timings1.txt`.
+
+  To specify a report enter `t` for `timings.txt` or `t1` for
+  `timings1.txt`.
+* **slay** _<player>_ _[msg]_  
+  Kills the specified player  
+
+  Kills a player with an optional `message`.
+
+* **spawn**  
+  Teleport player to spawn point  
+
+* **spectator|unspectator** _[player]_  
+  toggle a player's spectator mode  
+
+  `/spectator` will turn a player into an spectator.  In this mode
+  players can move but not interact (i.e. can't take/give damage,
+  can't place/break blocks, etc).
+
+  If no player was specified, it will list spectators.
+* **summon** _<player>_ _[message]_  
+  Summons a player to your location  
+* **throw** _<player>_ _[force]_  
+  Throw a player in the air  
+* **whois** _<player>_  
+  Gives detail information on players  
+
+
+Commands scheduled by `at` and `after` will only run as
 long as the server is running.  These scheduled commands will *not*
 survive server reloads or reboots.
 
-### Command repeater
+
+### Module reference
+
+#### join-mgr
+
+Announce joining ops, and show server motd
+
+This listener module will broadcast a message for ops joining
+a server.
+
+Also, it will show the server's motd on connect.
+
+#### repeater
+
+Uses `!!` to repeat command with changes
 
 If you want to repeat a previous command enter `!!` *without* any `/`
 in front.  This works for commands and chat messages.
@@ -153,126 +339,77 @@ in front.  This works for commands and chat messages.
 You can optionally append additional text to `!!` to do certain
 things:
 
-* `!!` number  
-  Will let you paginate output.  For example, entering:
-	/mw ls
-	!!2
-	!!3
+* `!!` number
+  - Will let you paginate output.  For example, entering:
+		/mw ls
+		!!2
+		!!3
   This will start showing the output of `/mw ls` and consecutive pages.
-* `!!` `/`  
-  if you forgot the `/` in front, this command will add it.  Example:
-	help
-	!!/
-* `!!` text  
-  Will append `text` to the previous command.  For example:
-	/gamemode
-	!! survival john
+* `!!` `/`
+  - if you forgot the `/` in front, this command will add it.  Example:
+		help
+		!!/
+* `!!` text
+  - Will append `text` to the previous command.  For example:
+		/gamemode
+		!! survival john
   This will show the usage of survival, the next line will change the
   gamemode of john to survival.
 * `!!` str1 str2
-  Will repate the previous command replacing `str1` with `str2`
-  Example:
-	/give player drt
-	!!drt dirt
+  - Will repeat the previous command replacing `str1` with `str2`
+    Example:
+		/give player drt
+		!!drt dirt
   This will change `drt` into `dirt`.
+* `!!`^ text
+  - Will insert `text` at the beginning of the command.
 
-### Listener Modules
-
-Also this plugin supports the following modules:
-
-* adminjoin : Broadcast a message when an op joins.
-* servermotd : Display the server's motd when connecting.
-* spawnitems : Initialize a player inventory when they spawn.  
-  It will place a configuratble list of inventory items.  Note that it
-  only does it for users who start without any inventory.  As soon as
-  they start owning stuff, spawnitems will stop working for them.
-* spawnarmor : Initialize a player armor when they spawn.  
-  *Broken in 1.5*
-  I will configure a player's armor through a configurable list.  Note
-  that it only does it for users without armor.
-* compasstp: When holding a compass tap the screen for 1 second, will
-  teleport you in the direciton you are facing.
-* unbreakable : Unbreakable blocks.
 
 ### Configuration
 
-Configuration is through the `config.yml` file:
+Configuration is throug the `config.yml` file.
+The following sections are defined:
 
-	---
-	settings:
-	  hard-freeze: false
-	unbreakable:
-	  - 32
-	  - 45
-	spawn:
-	  armor:
-	    head: '-'
-	    body: chainmail
-	    legs: leather
-	    boots: leather
-	  items:
-	  - "272:0:1"
-	  - "17:0:16"
-	  - "364:0:5"
-
-	...
-
-Settings:
-
-* `hard-freeze` : if `true` no movement is allowed for frozen
-  players.  If `false`, moves are not allowed, but turning is allowed.
-
-The `unbreakable` section is for the `unbreakable` listener module.
-Lists block ids that can not be broken.
-
-The `spawn` section contains two lists:
-
-* `armor`: defines the list of armor that players will spawn with.
-* `items`: lists the `item_id`:`damage`:`count` for initial items that
-  will be placed in the players inventory at spawn time.
-
-### Activating/De-activating modules
-
-There is a `modules.yml` that by default activates all modules.  You
-can de-activate modules by commenting them out from `modules.yml`.
-This is done by inserting a `#` in front of the text.
+#### features
 
 
-### Permission Nodes:
+This section you can enable/disable commands and listener modules.
+You do this in order to avoid conflicts between different
+PocketMine-MP plugins.  It has one line per feature:
 
-* gb.cmd.players - Allow players command
-* gb.cmd.ops - list server ops
-* gb.cmd.sudo - allow to run commands as somebody else
-* gb.cmd.gms: allow switch gamemode to survival
-* gb.cmd.gmc: allow switch gamemode to creative
-* gb.cmd.gma: allow switch gamemode to adventure
-* gb.cmd.slay: kill other players
-* gb.cmd.heal: healing
-* gb.cmd.whois: show player info
-* gb.cmd.whois.showip: Allow to view IP addresses
-* gb.cmd.seearmor: Show player's armor
-* gb.cmd.seeinv: Show player's inventory
-* gb.cmd.clearinv: Clear player's inventory
-* gb.cmd.get: get blocks.  A shortcut to give.
-* gb.spawnarmor.receive: allows player to receive armor when spawning
-* gb.spawnitems.receive: allows player to receive items when spawning
-* gb.cmd.timings: show timings data
-* gb.compasstp.allow : allow player to use a Compass to Teleport
-* gb.cmd.shield: Allow players to become invulnerable
-* gb.cmd.servicemode: Allow access to service mode command
-* gb.servicemode.allow: Allow login when in service mode.
-* gb.cmd.entities: Manage entities
-* gb.cmd.mute: mute/unmute
-* gb.cmd.freeze: freeze/thaw
-* gb.cmd.after: Access to command scheduler
-* gb.cmd.rpt: Report issues
-* gb.cmd.rpt.read: Read reported issues
-* gb.ubab.override: Can break blocks in the ubab list.
-* gb.cmd.summon: Access to summon/dismiss command
-* gb.cmd.pushpoptp: Access to push/pop teleport
+   feature: true|false
 
-Changes
--------
+If `true` the feature is enabled.  if `false` the feature is disabled.
+
+#### freeze-thaw
+
+
+* hard-freeze (false): if `true` no movement is allowed.  If `false`,
+  turning is allowed but not walking/running/flying, etc.
+
+#### join-mgr
+
+
+* adminjoin - broadcast whenever an op joins
+* servermotd - show the server's motd when joining
+
+#### rcon-client
+
+
+This section configures the rcon client connections.  You can configure
+this section through the *rcon* command.
+
+
+# Changes
+
+* 2.0.1: CallbackTasks
+  * Removed CallbackTask deprecation warnings
+* 2.0.0: Re-factoring
+  * Re-factoring the code so it is more maintainable
+  * Removed unbreakable (moved to WorldProtect), CompassTP (moved to
+    ToyBox), spawnitems, spawnarmor (moved to SpawnMgr).
+  * Added /prefix, /spawn, etc...
+  * /et subcommands: count and nuke, overall simplified entities.
 * 1.4.1: maintenance
   * Fixed a bug in showtimings.
   * Fixed improper usage of the API in Removing Tile and Entities.
@@ -314,11 +451,10 @@ Changes
   * Command repeater
 * 1.0.0 : First public release
 
-Copyright
----------
+# Copyright
 
-    GrabBag  
-    Copyright (C) 2015 Alejandro Liu  
+    GrabBag
+    Copyright (C) 2015 Alejandro Liu
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -336,20 +472,3 @@ Copyright
 
 * * *
 
-# REFACTOR
-
-* Main
-  * loader
-  * config
-  * state
-
-* Command
-  - common code
-    - paginate
-    - inGame
-    - access
-  <xxx>Cmd - modules.yml contains the cmd to class mapping
-  execute(Sender,$cmd,$args)
-
-* Manager - modules.yml contains the listener to class mapping
-  * <xxx>Mgr
