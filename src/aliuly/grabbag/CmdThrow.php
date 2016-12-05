@@ -14,12 +14,16 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\math\Vector3;
 
-class CmdThrow extends BaseCommand {
+use aliuly\grabbag\common\BasicCli;
+use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\MPMU;
+
+class CmdThrow extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
 		$this->enableCmd("throw",
-							  ["description" => "Throw player up in the air",
-								"usage" => "/throw <player> [force]",
+							  ["description" => mc::_("Throw player up in the air"),
+								"usage" => mc::_("/throw <player> [force]"),
 								"permission" => "gb.cmd.throw"]);
 	}
 	public function onCommand(CommandSender $sender,Command $cmd,$label, array $args) {
@@ -27,15 +31,19 @@ class CmdThrow extends BaseCommand {
 		if (count($args) > 2 || count($args) == 0) return false;
 		$pl = $this->owner->getServer()->getPlayer($args[0]);
 		if (!$pl) {
-			$sender->sendMessage("$args[0] not found");
+			$sender->sendMessage(mc::_("%1% not found",$args[0]));
 			return true;
 		}
-		$force = 64;
-		if (isset($args[1])) $force = intval($args[1]);
-		if ($force <= 4) $force = 64;
 
-		$pl->setMotion(new Vector3(0,$force,0));
+		if (MPMU::apiVersion("1.12.0")) {
+			$pl->teleport(new Vector3($pl->getX(),128,$pl->getZ()));
+		} else {
+			$force = 64;
+			if (isset($args[1])) $force = intval($args[1]);
+			if ($force <= 4) $force = 64;
 
+			$pl->setMotion(new Vector3(0,$force,0));
+		}
 		return true;
 	}
 }

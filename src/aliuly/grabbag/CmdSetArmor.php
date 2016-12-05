@@ -24,12 +24,16 @@ use pocketmine\command\Command;
 use pocketmine\utils\TextFormat;
 use pocketmine\item\Item;
 
-class CmdSetArmor extends BaseCommand {
+use aliuly\grabbag\common\BasicCli;
+use aliuly\grabbag\common\mc;
+use aliuly\grabbag\common\MPMU;
+
+class CmdSetArmor extends BasicCli implements CommandExecutor {
 	public function __construct($owner) {
 		parent::__construct($owner);
 		$this->enableCmd("setarmor",
-							  ["description" => "Set armor (even in creative)",
-								"usage" => "/setarmor [player] [piece] <type>",
+							  ["description" => mc::_("Set armor (even in creative)"),
+								"usage" => mc::_("/setarmor [player] [piece] <type>"),
 								"permission" => "gb.cmd.setarmor"]);
 	}
 	private function armorSlot($str) {
@@ -71,7 +75,7 @@ class CmdSetArmor extends BaseCommand {
 		if (count($args) == 0) return false;
 		$i = array_pop($args);
 		if (($type = $this->armorType($i)) == -1) {
-			$sender->sendMessage("Unknown armor type $i");
+			$sender->sendMessage(mc::_("Unknown armor type %1%",$i));
 			return false;
 		}
 		$slots = [0,1,2,3]; // All slots
@@ -87,21 +91,23 @@ class CmdSetArmor extends BaseCommand {
 			$i = $this->owner->getServer()->getPlayer($args[count($args)-1]);
 			if ($i) {
 				$pl = $i;
-				if (!$this->access($sender,"gb.cmd.setarmor.others")) return true;
+				if (!MPMU::access($sender,"gb.cmd.setarmor.others")) return true;
 				array_pop($args);
 			}
 		}
 		if (count($args)) return false;
-		if (!$this->inGame($pl)) return true;
+		if (!MPMU::inGame($pl)) return true;
 		foreach($slots as $i) {
 			$pl->getInventory()->setArmorItem($i,
 														 new Item($type == 0 ? 0 :$type+$i,
 																	 0,1));
 		}
 		if ($type == 0)
-			$sender->sendMessage("Amouring down ".$pl->getName());
+			$sender->sendMessage(mc::_("Amouring down %1%",$pl->getName()));
 		else
-			$sender->sendMessage("Amouring up ".$pl->getName());
+			$sender->sendMessage(mc::_("Amouring up %1%",$pl->getName()));
+		// Make sure inventory is updated...
+		$pl->getInventory()->sendArmorContents($pl);
 		return true;
 	}
 }

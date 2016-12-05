@@ -1,52 +1,41 @@
 <?php
-namespace aliuly\grabbag;
+namespace aliuly\grabbag\common;
 
 use pocketmine\command\ConsoleCommandSender;
-use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\command\PluginCommand;
-use pocketmine\utils\Config;
+use pocketmine\Player;
 
 use pocketmine\utils\TextFormat;
-use pocketmine\Player;
-use pocketmine\item\Item;
 
-abstract class BaseCommand implements CommandExecutor {
+/**
+ * Implements Basic CLI common functionality.  It is useful for plugins
+ * that implement multiple commands or sub-commands
+ */
+abstract class BasicCli {
 	protected $owner;
-
+	/**
+	 * @param BasicPlugin @owner - Plugin that owns this module
+	 */
 	public function __construct($owner) {
 		$this->owner = $owner;
 	}
-
-	static $items = [];
-
-	public function itemName(Item $item) {
-		if (count(self::$items) == 0) {
-			$constants = array_keys((new \ReflectionClass("pocketmine\\item\\Item"))->getConstants());
-			foreach ($constants as $constant) {
-				$id = constant("pocketmine\\item\\Item::$constant");
-				$constant = str_replace("_", " ", $constant);
-				self::$items[$id] = $constant;
-			}
-		}
-		$n = $item->getName();
-		if ($n != "Unknown") return $n;
-		if (isset(self::$items[$item->getId()]))
-			return self::$items[$item->getId()];
-		return $n;
+  /**
+	 * Register this class as a sub-command.  See BasicPlugin for details.
+	 *
+	 * @param str $cmd - sub-command to register
+	 * @param mixed[] $opts - additional options for registering sub-command
+	 */
+	public function enableSCmd($cmd,$opts) {
+		$this->owner->registerScmd($cmd,[$this,"onSCommand"],$opts);
 	}
-
-	public function mwteleport($pl,$pos) {
-		if (($pos instanceof Position) &&
-			 ($mw = $this->owner->getServer()->getPluginManager()->getPlugin("ManyWorlds")) != null) {
-			// Using ManyWorlds for teleporting...
-			$mw->mwtp($pl,$pos);
-		} else {
-			$pl->teleport($pos);
-		}
-	}
-
+	/**
+	 * Register this class as a command.
+	 *
+	 * @param str $cmd - command to register
+	 * @param mixed[] $yaml - options for command
+	 */
 	public function enableCmd($cmd,$yaml) {
 		$newCmd = new PluginCommand($cmd,$this->owner);
 		if (isset($yaml["description"]))
@@ -72,40 +61,13 @@ abstract class BaseCommand implements CommandExecutor {
 		$cmdMap = $this->owner->getServer()->getCommandMap();
 		$cmdMap->register($this->owner->getDescription()->getName(),$newCmd);
 	}
-
-	public function inGame(CommandSender $sender,$msg = true) {
-		if (!($sender instanceof Player)) {
-			if ($msg) $sender->sendMessage("You can only do this in-game");
-			return false;
-		}
-		return true;
-	}
-
-	// Access and other permission related checks
-	protected function access(CommandSender $sender, $permission) {
-		if($sender->hasPermission($permission)) return true;
-		$sender->sendMessage("You do not have permission to do that.");
-		return false;
-	}
-
-	public function iName($player) {
-		if ($player instanceof Player) {
-			$player = strtolower($player->getName());
-		}
-		return $player;
-	}
-
-	public function getState(CommandSender $player,$default) {
-		return $this->owner->getState(get_class($this),$player,$default);
-	}
-	public function setState(CommandSender $player,$val) {
-		$this->owner->setState(get_class($this),$player,$val);
-	}
-	public function unsetState(CommandSender $player) {
-		$this->owner->unsetState(get_class($this),$player);
-	}
-
-	// Paginate output
+	/**
+	 * Use for paginaged output implementation.
+	 * This gets the player specified page number that we want to Display
+	 *
+	 * @param str[] $args - Passed arguments
+	 * @return int page number
+	 */
 	protected function getPageNumber(array &$args) {
 		$pageNumber = 1;
 		if (count($args) && is_numeric($args[count($args)-1])) {
@@ -114,6 +76,15 @@ abstract class BaseCommand implements CommandExecutor {
 		}
 		return $pageNumber;
 	}
+	/**
+	 * Use for paginaged output implementation.
+	 * Shows a bunch of line in paginated output.
+	 *
+	 * @param CommandSender $sender - entity that we need to display text to
+	 * @param int $pageNumber - page that we need to display
+	 * @param str[] $txt - Array containing one element per output line
+	 * @return bool true
+	 */
 	protected function paginateText(CommandSender $sender,$pageNumber,array $txt) {
 		$hdr = array_shift($txt);
 		if($sender instanceof ConsoleCommandSender){
@@ -137,6 +108,15 @@ abstract class BaseCommand implements CommandExecutor {
 		}
 		return true;
 	}
+	/**
+	 * Use for paginaged output implementation.
+	 * Formats and paginates a table
+	 *
+	 * @param CommandSender $sender - entity that we need to display text to
+	 * @param int $pageNumber - page that we need to display
+	 * @param str[][] $txt - Array containing one element per cell
+	 * @return bool true
+	 */
 	protected function paginateTable(CommandSender $sender,$pageNumber,array $tab) {
 		$cols = [];
 		for($i=0;$i < count($tab[0]);$i++) $cols[$i] = strlen($tab[0][$i]);
@@ -157,13 +137,38 @@ abstract class BaseCommand implements CommandExecutor {
 		return $this->paginateText($sender,$pageNumber,$txt);
 	}
 
-	protected function cfgSave($key,$settings) {
-		$cfg=new Config($this->owner->getDataFolder()."config.yml",Config::YAML);
-		$dat = $cfg->getAll();
-		$dat[$key] = $settings;
-		$cfg->setAll($dat);
-		$cfg->save();
+	//////////////////////////////////////////////////////////////////////
+	/**
+   * Entry point for BasicPlugin state functionality.  This makes it module
+	 * specific.
+	 * Retrieves the state.
+	 *
+	 * @param CommandSender $player - entity that we need state from
+	 * @param mixed $default - Default value to return if no state found
+	 * @return mixed $state
+	 */
+	public function getState(CommandSender $player,$default) {
+		return $this->owner->getState(get_class($this),$player,$default);
 	}
-
-	//public function onCommand(CommandSender $sender,Command $command,$label, array $args);
+	/**
+   * Entry point for BasicPlugin state functionality.  This makes it module
+	 * specific.
+	 * Sets the state.
+	 *
+	 * @param CommandSender $player - entity that we need to set state
+	 * @param mixed $val - Value to use for the state
+	 */
+	public function setState(CommandSender $player,$val) {
+		$this->owner->setState(get_class($this),$player,$val);
+	}
+	/**
+   * Entry point for BasicPlugin state functionality.  This makes it module
+	 * specific.
+	 * UnSets the state.
+	 *
+	 * @param CommandSender $player - entity that we need to unset state
+	 */
+	public function unsetState(CommandSender $player) {
+		$this->owner->unsetState(get_class($this),$player);
+	}
 }
